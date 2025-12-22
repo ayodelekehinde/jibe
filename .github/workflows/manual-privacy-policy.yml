@@ -28,10 +28,23 @@ jobs:
       - name: Prepare Site
         run: |
           mkdir -p public/privacy-policy
-          cp PRIVACY_POLICY.md public/privacy-policy/index.md
-          # Create a default config for Jekyll to use a nice theme
-          echo "theme: jekyll-theme-slate" > public/_config.yml
-          echo "title: Jibe Privacy Policy" >> public/_config.yml
+          
+          # 1. Create the Privacy Policy HTML directly (Static, no Jekyll needed)
+          echo "<!DOCTYPE html><html><head><title>Jibe Privacy Policy</title>" > public/privacy-policy/index.html
+          echo "<meta name='viewport' content='width=device-width, initial-scale=1'><style>body{font-family:system-ui,-apple-system,sans-serif;max-width:800px;margin:0 auto;padding:20px;line-height:1.6}h1{border-bottom:1px solid #eaeaea;padding-bottom:10px}</style>" >> public/privacy-policy/index.html
+          echo "</head><body>" >> public/privacy-policy/index.html
+          
+          # Convert pseudo-markdown to HTML (simple replacement for headers)
+          # Note: generic sed replacement for # headers to h1/h2 is fragile but sufficient for this specific simple file
+          sed 's/^# \(.*\)/<h1>\1<\/h1>/' PRIVACY_POLICY.md | sed 's/^## \(.*\)/<h2>\1<\/h2>/' >> public/privacy-policy/index.html
+          
+          echo "</body></html>" >> public/privacy-policy/index.html
+          
+          # 2. Create Root Redirect
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=./privacy-policy/" /></head><body>Redirecting...</body></html>' > public/index.html
+          
+          # 3. Disable Jekyll to ensure files are served exactly as is
+          touch public/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
