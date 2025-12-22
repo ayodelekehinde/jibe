@@ -29,21 +29,133 @@ jobs:
         run: |
           mkdir -p public/privacy-policy
           
-          # 1. Create the Privacy Policy HTML directly (Static, no Jekyll needed)
-          echo "<!DOCTYPE html><html><head><title>Jibe Privacy Policy</title>" > public/privacy-policy/index.html
-          echo "<meta name='viewport' content='width=device-width, initial-scale=1'><style>body{font-family:system-ui,-apple-system,sans-serif;max-width:800px;margin:0 auto;padding:20px;line-height:1.6}h1{border-bottom:1px solid #eaeaea;padding-bottom:10px}</style>" >> public/privacy-policy/index.html
-          echo "</head><body>" >> public/privacy-policy/index.html
+          # Create python script to convert MD to HTML with Styles
+          cat <<EOF > convert.py
+          import re
           
-          # Convert pseudo-markdown to HTML (simple replacement for headers)
-          # Note: generic sed replacement for # headers to h1/h2 is fragile but sufficient for this specific simple file
-          sed 's/^# \(.*\)/<h1>\1<\/h1>/' PRIVACY_POLICY.md | sed 's/^## \(.*\)/<h2>\1<\/h2>/' >> public/privacy-policy/index.html
+          css = """
+          <style>
+              :root {
+                  --primary-color: #2c3e50;
+                  --text-color: #333;
+                  --bg-color: #f9f9f9;
+                  --card-bg: #ffffff;
+              }
+              body {
+                  font-family: 'Segoe UI', SYSTEM-UI, -apple-system, sans-serif;
+                  line-height: 1.6;
+                  color: var(--text-color);
+                  background-color: var(--bg-color);
+                  max-width: 800px;
+                  margin: 0 auto;
+                  padding: 40px 20px;
+              }
+              .container {
+                  background: var(--card-bg);
+                  padding: 40px;
+                  border-radius: 12px;
+                  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+              }
+              h1 {
+                  color: var(--primary-color);
+                  border-bottom: 2px solid #eaeaea;
+                  padding-bottom: 10px;
+                  margin-top: 0;
+              }
+              h2 {
+                  color: var(--primary-color);
+                  margin-top: 30px;
+              }
+              ul {
+                  padding-left: 20px;
+              }
+              li {
+                  margin-bottom: 8px;
+              }
+              strong {
+                  color: #000;
+                  font-weight: 600;
+              }
+              .footer {
+                  margin-top: 40px;
+                  text-align: center;
+                  font-size: 0.9em;
+                  color: #666;
+              }
+          </style>
+          """
           
-          echo "</body></html>" >> public/privacy-policy/index.html
+          html_start = f"""
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Jibe Privacy Policy</title>
+              {css}
+          </head>
+          <body>
+              <div class="container">
+          """
+          
+          html_end = """
+              </div>
+              <div class="footer">
+                  <p>&copy; 2025 Jibe Project. Open Source.</p>
+              </div>
+          </body>
+          </html>
+          """
+          
+          with open("PRIVACY_POLICY.md", "r") as f:
+              lines = f.readlines()
+              
+          content = ""
+          in_list = False
+          
+          for line in lines:
+              line = line.strip()
+              
+              # Basic MD parsing
+              
+              # Headers
+              if line.startswith("# "):
+                  if in_list: content += "</ul>\\n"; in_list = False
+                  content += f"<h1>{line[2:]}</h1>\\n"
+              elif line.startswith("## "):
+                  if in_list: content += "</ul>\\n"; in_list = False
+                  content += f"<h2>{line[3:]}</h2>\\n"
+              elif line.startswith("- "):
+                  if not in_list: content += "<ul>\\n"; in_list = True
+                  # Handle bold in lists if needed, but generic line processing handles it below
+                  clean_line = line[2:]
+                  # Simple bold replacement **text** -> <strong>text</strong>
+                  clean_line = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', clean_line)
+                  content += f"<li>{clean_line}</li>\\n"
+              elif line == "":
+                  if in_list: content += "</ul>\\n"; in_list = False
+                  content += "<br>\\n"
+              else:
+                  if in_list: content += "</ul>\\n"; in_list = False
+                  clean_line = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', line)
+                  content += f"<p>{clean_line}</p>\\n"
+                  
+          if in_list: content += "</ul>\\n"
+          
+          final_html = html_start + content + html_end
+          
+          with open("public/privacy-policy/index.html", "w") as f:
+              f.write(final_html)
+              
+          print("Converted successfully.")
+          EOF
+          
+          python3 convert.py
           
           # 2. Create Root Redirect
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=./privacy-policy/" /></head><body>Redirecting...</body></html>' > public/index.html
           
-          # 3. Disable Jekyll to ensure files are served exactly as is
+          # 3. Disable Jekyll
           touch public/.nojekyll
 
       - name: Upload artifact
