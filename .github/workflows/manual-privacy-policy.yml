@@ -43,44 +43,58 @@ jobs:
               }
               body {
                   font-family: 'Segoe UI', SYSTEM-UI, -apple-system, sans-serif;
-                  line-height: 1.6;
+                  line-height: 1.5;
                   color: var(--text-color);
                   background-color: var(--bg-color);
                   max-width: 800px;
                   margin: 0 auto;
-                  padding: 40px 20px;
+                  padding: 20px 15px;
               }
               .container {
                   background: var(--card-bg);
-                  padding: 40px;
-                  border-radius: 12px;
-                  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                  padding: 30px;
+                  border-radius: 8px;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
               }
               h1 {
                   color: var(--primary-color);
                   border-bottom: 2px solid #eaeaea;
-                  padding-bottom: 10px;
+                  padding-bottom: 8px;
                   margin-top: 0;
+                  margin-bottom: 20px;
+                  font-size: 1.8em;
               }
               h2 {
                   color: var(--primary-color);
-                  margin-top: 30px;
+                  margin-top: 24px;
+                  margin-bottom: 12px;
+                  font-size: 1.4em;
+              }
+              h3 {
+                  color: var(--text-color);
+                  margin-top: 20px;
+                  margin-bottom: 8px;
+                  font-size: 1.1em;
+              }
+              p {
+                margin-bottom: 12px;
               }
               ul {
                   padding-left: 20px;
+                  margin-bottom: 12px;
               }
               li {
-                  margin-bottom: 8px;
+                  margin-bottom: 4px;
               }
               strong {
                   color: #000;
                   font-weight: 600;
               }
               .footer {
-                  margin-top: 40px;
+                  margin-top: 30px;
                   text-align: center;
-                  font-size: 0.9em;
-                  color: #666;
+                  font-size: 0.85em;
+                  color: #888;
               }
           </style>
           """
@@ -125,6 +139,9 @@ jobs:
               elif line.startswith("## "):
                   if in_list: content += "</ul>\\n"; in_list = False
                   content += f"<h2>{line[3:]}</h2>\\n"
+              elif line.startswith("### "):
+                  if in_list: content += "</ul>\\n"; in_list = False
+                  content += f"<h3>{line[4:]}</h3>\\n"
               elif line.startswith("- "):
                   if not in_list: content += "<ul>\\n"; in_list = True
                   # Handle bold in lists if needed, but generic line processing handles it below
