@@ -27,8 +27,8 @@ jobs:
 
       - name: Prepare Site
         run: |
-          mkdir public
-          cp PRIVACY_POLICY.md public/index.md
+          mkdir -p public/privacy-policy
+          cp PRIVACY_POLICY.md public/privacy-policy/index.md
           # Create a default config for Jekyll to use a nice theme
           echo "theme: jekyll-theme-slate" > public/_config.yml
           echo "title: Jibe Privacy Policy" >> public/_config.yml
