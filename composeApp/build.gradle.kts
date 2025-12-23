@@ -97,6 +97,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Jibe"
             packageVersion = appVersion
+            println("AppVersion is $appVersion")
             description = "A Jibe companion for desktop."
 
             macOS {
