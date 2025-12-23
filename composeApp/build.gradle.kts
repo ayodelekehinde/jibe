@@ -94,10 +94,10 @@ compose.desktop {
         jvmArgs += listOf("-Dapple.awt.UIElement=true")
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "Jibe"
-            packageVersion = appVersion
-            println("AppVersion is $appVersion")
+            packageVersion = "$appVersion"
+            println("Is string: ${appVersion is String}")
             description = "A Jibe companion for desktop."
 
             macOS {
