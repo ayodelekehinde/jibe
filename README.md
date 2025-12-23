@@ -4,16 +4,21 @@
 ![Badge-Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Desktop-green.svg)
 ![Badge-Kotlin](https://img.shields.io/badge/Kotlin-2.2.20-purple.svg)
 ![Badge-Compose](https://img.shields.io/badge/Compose-Multiplatform-blue.svg)
+<a href='https://play.google.com/store/apps/details?id=com.cherrio.jibe'>
+  <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height='60'/>
+</a>
 
 **Jibe** is a modern, cross-platform companion application built with **Kotlin Multiplatform** and **Compose Multiplatform**. It enables seamless peer-to-peer connection between devices (Android and Desktop) functionality.
 
 ## Features
 
--   **Cross-Platform Support**: Runs natively on Android, macOS, Windows, and Linux.
--   **Peer-to-Peer Connection**: Connect devices directly over the local network via TCP sockets.
--   **Extensible Plugin System**: capabilities are modular (e.g., Clipboard sharing).
--   **Modern UI**: Built entirely with Jetpack Compose / Compose Multiplatform.
--   **System Tray Integration**: Unobtrusive desktop experience with tray support.
+- [x] **Cross-Platform Support**: Runs natively on Android, macOS, Windows, and Linux (not tested).
+- [x] **Peer-to-Peer Connection**: Connect devices directly over the local network via TCP sockets.
+- [x] **Clipboard Synchronization**: Instantly sync clipboard content between connected devices.
+- [x] **Privacy First**: No external servers; data stays on your local network.
+- [x] **System Tray Integration**: Unobtrusive desktop experience with tray support.
+- [ ] **File Transfer**: Send files seamlessly between devices (Coming Soon).
+- [ ] **End-to-End Encryption**: Enhanced security for your data (Planned).
 
 ## Tech Stack
 
