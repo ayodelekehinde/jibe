@@ -2,6 +2,14 @@ name: Build Desktop App
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release Version (e.g. 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+permissions:
+  contents: write
 
 jobs:
   build-desktop:
@@ -24,18 +32,44 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build Desktop Distribution
-        run: ./gradlew :composeApp:packageReleaseDistributionForCurrentOS
+        run: ./gradlew :composeApp:packageReleaseDistributionForCurrentOS -PappVersion=${{ inputs.version }}
 
       - name: Upload Artifact (Mac)
         if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
-          name: jibe-mac-dmg
+          name: jibe-mac-${{ inputs.version }}
           path: composeApp/build/compose/binaries/main-release/dmg/*.dmg
 
       - name: Upload Artifact (Windows)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: jibe-windows-msi
+          name: jibe-windows-${{ inputs.version }}
           path: composeApp/build/compose/binaries/main-release/msi/*.msi
+
+  release:
+    needs: build-desktop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Release Desktop v${{ inputs.version }}
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/jibe-mac-${{ inputs.version }}/*.dmg
+            artifacts/jibe-windows-${{ inputs.version }}/*.msi

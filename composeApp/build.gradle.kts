@@ -1,5 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.*
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +9,14 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
 }
+
+val versionProps = Properties()
+val versionPropsFile = file("../version.properties")
+if (versionPropsFile.exists()) {
+    versionProps.load(versionPropsFile.inputStream())
+}
+val appVersion = project.findProperty("appVersion") as? String ?: versionProps["appVersion"] as? String ?: "1.0.0"
+val appVersionCode = (versionProps["versionCode"] as? String)?.toInt() ?: 1
 
 kotlin {
     androidTarget {
@@ -56,8 +65,8 @@ android {
         applicationId = "com.cherrio.jibe"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = appVersion
     }
     packaging {
         resources {
@@ -87,7 +96,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Jibe"
-            packageVersion = "1.0.0"
+            packageVersion = appVersion
             description = "A Jibe companion for desktop."
 
             macOS {
