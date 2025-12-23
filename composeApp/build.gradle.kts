@@ -15,7 +15,7 @@ val versionPropsFile = file("../version.properties")
 if (versionPropsFile.exists()) {
     versionProps.load(versionPropsFile.inputStream())
 }
-val appVersion = project.findProperty("appVersion") as? String ?: versionProps["appVersion"] as? String ?: "1.0.0"
+val appVersion = versionProps["appVersion"] as? String ?: "1.0.0"
 val appVersionCode = (versionProps["versionCode"] as? String)?.toInt() ?: 1
 
 kotlin {
@@ -96,8 +96,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "Jibe"
-            packageVersion = "$appVersion"
-            println("Is string: ${appVersion is String}")
+            packageVersion = appVersion
             description = "A Jibe companion for desktop."
 
             macOS {
